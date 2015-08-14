@@ -1,0 +1,20 @@
+extends ../layouts/default
+block content
+  h2 Config
+  form(action="/config" method="post")
+    h3 General
+    label(for="domain") Domain
+    input.u-full-width(type="text" name="domain" placeholder="example.org" id="domain" value=domain)
+    
+    h3 CloudFlare
+    .row
+      .one-half.column
+        label(for="cfUser") E-Mail
+        input.u-full-width(type="email" name="cloudflare.user" placeholder="mail@example.org" id="cfUser" value=cloudflare.user)
+      .one-half.column
+        label(for="cfKey") API-Token
+        input.u-full-width(type="text" name="cloudflare.key" placeholder="###-###-###" id="cfKey" value=cloudflare.key)
+    h3 Update
+    label(for="updateInterval") Update Interval
+    input.u-full-width(type="text" name="interval" placeholder="*/10 * * * * (Cron syntax)" id="updateInterval" value=interval)
+    p How often the network interface will get polled for an IP change.

@@ -1,0 +1,23 @@
+extends ../layouts/default
+block content
+  h2 Devices
+  table.u-full-width
+    thead
+      tr
+        th Name
+        th MAC
+        th Domain
+        th Actions
+    tbody
+      each device in devices
+        tr
+          td
+            a(href="/devices/"+device.mac)= device.name
+          td
+            code= device.mac
+          td= device.domain
+          td
+            form.u-inline-form.u-margin-right(action="/devices/delete/"+device.mac method="post")
+              button.button-primary(type="submit") Delete
+            a.button.button-edit(href="/devices/edit/"+device.mac) Edit
+  a.button.button-primary(href="/devices/new") Add Device

@@ -1,0 +1,15 @@
+extends ../layouts/default
+block content
+  h2 New Device
+  form(action="/devices" method="POST")
+    .row
+      .six.columns
+        label(for="deviceName") Name
+        input.u-full-width(type="text" name="name" placeholder="Human-friendly name" id="deviceName")
+      .six.columns
+        label(for="deviceMac") MAC
+        input.u-full-width(type="text" name="mac" placeholder="aa:bb:cc:dd:ee:ff" id="deviceMac")
+    label(for="deviceDomain") Domain
+    input.u-full-width(type="text" name="domain" placeholder="DNS subdomain" id="deviceDomain")
+    a.button.u-margin-right(href="/devices") Cancel
+    button.button-primary(type="submit") Add

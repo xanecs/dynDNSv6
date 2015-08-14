@@ -1,0 +1,20 @@
+doctype html
+html
+  head
+    title dynDNSv6
+    link(rel="stylesheet" href="/css/normalize.css")
+    link(rel="stylesheet" href="/css/skeleton.css")
+    link(rel="stylesheet" href="/css/font-awesome.css")
+    link(rel="stylesheet" href="/css/custom.css")
+  body
+    .container
+      nav.navbar
+        .container
+          ul.navbar-list
+            li.navbar-item
+              a.navbar-link(href="/") Dashboard
+            li.navbar-item
+              a.navbar-link(href="/devices") Devices
+            li.navbar-item
+              a.navbar-link(href="/config") Config
+      block content

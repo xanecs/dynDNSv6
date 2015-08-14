@@ -1,0 +1,22 @@
+extends ../layouts/default
+block content
+  .u-pull-right
+    form.u-inline-form.u-margin-right(action="/devices/delete/"+device.mac method="post")
+      button.button-primary(type="submit") Delete
+    a.button.button-edit(href="/devices/edit/"+device.mac) Edit
+  h2= device.name
+  .row
+    .two.columns
+      strong Domain
+    .ten.columns
+      span= device.domain
+  .row
+    .two.columns
+      strong MAC
+    .ten.columns
+      code= device.mac
+  .row
+    .two.columns
+      strong IP
+    .ten.columns
+      code= device.ip

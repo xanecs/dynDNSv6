@@ -1,0 +1,19 @@
+{
+  "name": "dyndns-v6",
+  "version": "0.0.1",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Leon Bentrup <leon@leonadi.de>",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.13.3",
+    "express": "^4.13.3",
+    "ip-address": "^4.2.0",
+    "jade": "^1.11.0",
+    "mongoose": "^4.1.1",
+    "stylus": "^0.52.0"
+  }
+}
