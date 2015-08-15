@@ -46,3 +46,18 @@
 .u-margin-right {
   margin-right: 1rem;
 }
+
+/* --- Config Page --- */
+
+.config-section {
+  margin-top: 20px;
+}
+
+/* --- Alerts --- */
+.alert {
+  background: #33C3F0;
+  color: #fff;
+  border-radius: 4px;
+  padding: 5px 15px;
+  margin-bottom: 20px;
+}

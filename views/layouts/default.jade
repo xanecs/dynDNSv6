@@ -2,6 +2,7 @@ doctype html
 html
   head
     title dynDNSv6
+    link(rel="stylesheet" href="http://fonts.googleapis.com/css?family=Raleway:400,600,300")
     link(rel="stylesheet" href="/css/normalize.css")
     link(rel="stylesheet" href="/css/skeleton.css")
     link(rel="stylesheet" href="/css/font-awesome.css")
@@ -17,4 +18,6 @@ html
               a.navbar-link(href="/devices") Devices
             li.navbar-item
               a.navbar-link(href="/config") Config
+      - if(errors && errors.length > 0)
+        .alert= errors
       block content
