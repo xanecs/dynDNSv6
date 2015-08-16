@@ -9,6 +9,7 @@
   "author": "Leon Bentrup <leon@leonadi.de>",
   "license": "MIT",
   "dependencies": {
+    "async": "^1.4.2",
     "body-parser": "^1.13.3",
     "cloudflare": "0.0.8",
     "connect-flash": "^0.1.1",

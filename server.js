@@ -5,6 +5,7 @@ var sessions = require('express-session');
 var flash = require('connect-flash');
 var cookieParser = require('cookie-parser');
 
+var schedule = require('./functions/schedule');
 var Config = require('./models/config');
 
 var app = express();
@@ -51,4 +52,7 @@ app.use(function (err, req, res, next) {
 });
 
 mongoose.connect('localhost', 'dyndns');
+schedule.schedule(function (err) {
+  if (err) console.error(err);
+});
 app.listen(3000);

@@ -22,9 +22,9 @@ module.exports = function (router) {
       return newConf.save(function (err) {
         if (err) return next(err);
         res.redirect('/config');
-      })
+      });
     }
-    Config.update({}, req.body, function (err, res) {
+    Config.update({}, req.body, function (err, result) {
       if (err) return next(err);
       res.redirect('/config');
     });

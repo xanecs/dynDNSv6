@@ -1,7 +1,44 @@
-var schedule = require('node-schedule');
 var cloudflare = require('cloudflare');
 var Config = require('../models/config');
 var Device = require('../models/device');
+var async = require('async');
+
+function updateDevice (domain, client, records) {
+  return function (device, cb) {
+    async.detect(records, function (record, cb) {
+      cb(record.display_name === device.domain && record.type === 'AAAA');
+    },
+    function (record) {
+      var options = {
+        name: device.domain,
+        type: 'AAAA',
+        content: device.ip,
+        ttl: 1
+      };
+      var handleResult = function (err, result) {
+        if (err) return cb(err);
+        cb(null);
+      };
+      if (record) return client.editDomainRecord(domain.zone_name, record.rec_id, options, handleResult);
+      client.addDomainRecord(domain.zone_name, options, handleResult);
+    });
+  };
+}
+
+function handleDomain (client, cb) {
+  return function (domain) {
+    if (!domain) return cb('Domain not found');
+    client.listDomainRecords(domain.zone_name, function (err, records) {
+      if (err) return cb(err);
+      Device.find({}, function (err, devices) {
+        if (err) return cb(err);
+        async.each(devices, updateDevice(domain, client, records), function(err) {
+          cb(err);
+        });
+      })
+    });
+  };
+}
 
 function updateCloudflare (cb) {
   Config.findOne({}, function (err, config) {
@@ -12,49 +49,10 @@ function updateCloudflare (cb) {
       token: config.cloudflare.key
     });
     client.listDomains(function (err, domains) {
-      var domain = null;
-      domains.forEach(function(zone) {
-        if (zone.zone_name === config.domain) domain = zone;
-      });
-      if (!domain) return cb('Domain not found in Cloudflare');
-      client.listDomainRecords(domain.zone_name, function (err, records) {
-        if (err) return cb(err);
-        Device.find({}, function (err, devices) {
-          if (err) return cb(err);
-          devices.forEach(function (device) {
-            var exists = false;
-            var record = null;
-            records.forEach(function(rec) {
-              if (rec.display_name === device.domain && rec.type === 'AAAA') {
-                exists = true;
-                record = rec;
-              }
-            });
-            
-            if (exists) {
-              return client.editDomainRecord(domain.zone_name, record.rec_id, {
-                name: device.domain,
-                type: 'AAAA',
-                content: device.ip,
-                ttl: 1,
-              }, function (err, result) {
-                if (err) return cb(err);
-                cb(null, result);
-              });
-            }
-            client.addDomainRecord(domain.zone_name, {
-              name: device.domain,
-              type: 'AAAA',
-              content: device.ip,
-              ttl: 1
-            }, function (err, result) {
-              if (err) return cb(err);
-              cb(null, result);
-            })
-          });
-        });
-        cb(null, records);
-      });
+      if(err) return cb(err);
+      async.detect(domains, function(zone, cb) {
+        cb(zone.zone_name === config.domain);
+      }, handleDomain(client, cb));
     });
   });
 }

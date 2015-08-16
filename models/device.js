@@ -17,7 +17,6 @@ deviceSchema.virtual('ip').get(function () {
   var mac = this.mac.toLowerCase().split(':');
   var firstByte = binstring(mac[0], {in: 'hex', out: 'bytes'})[0];
   var flipped = firstByte ^ 2;
-  console.log(flipped);
   var flippedByte = binstring([flipped], {in: 'bytes', out: 'hex'});
   return prefix + ':' + flippedByte + mac[1] + ':' + mac[2] + 'ff:fe' + mac[3] + ':' + mac[4] + mac[5];
 });

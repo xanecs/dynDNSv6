@@ -1,3 +1,39 @@
 extends layouts/default
 block content
-  h2 Dashboard
+  h2 Status
+  .row
+    .two.columns
+      strong Current set prefix
+    .ten.columns
+      code= status.lastPrefix
+  .row
+    .two.columns
+      strong Last run
+    .ten.columns
+      span= status.lastRun.toString()
+  .row
+    .two.columns
+      strong Last update
+    .ten.columns
+      span= status.lastChangeRun.toString()
+  
+  .row
+    .two.columns
+      strong Number of runs
+    .ten.columns
+      span= status.numRuns
+  .row
+    .two.columns
+      strong DNS updates
+    .ten.columns
+      span= status.numChangeRuns
+      
+  - if(status.error)
+    .row
+      .two.columns
+        strong Error
+      .ten.columns
+        span= status.error
+  section.config-section
+    form(action="/update" method="post")
+      button.button.button-primary(type="submit") Update Now
