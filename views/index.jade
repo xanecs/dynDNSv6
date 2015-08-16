@@ -5,7 +5,7 @@ block content
     .two.columns
       strong Current set prefix
     .ten.columns
-      code= status.lastPrefix
+      code= status.lastPrefix + '::'
   .row
     .two.columns
       strong Last run
@@ -35,5 +35,7 @@ block content
       .ten.columns
         span= status.error
   section.config-section
-    form(action="/update" method="post")
+    form.u-inline-form.u-margin-right(action="/update" method="post")
       button.button.button-primary(type="submit") Update Now
+    form.u-inline-form(action="/forceupdate" method="post")
+      button.button(type="submit") Force Update Now
