@@ -36,6 +36,7 @@ function scheduleJob(cb) {
     if(err) return cb(err);
     if(!config) return cb('Not yet configured');
     job = schedule.scheduleJob(config.interval, jobFunc);
+    jobFunc(true);
   });
 }
 
