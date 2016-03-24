@@ -10,7 +10,8 @@ exports.prefix = function () {
       address = nic[i];
       if (address.internal) continue;
       if (address.family !== 'IPv6') continue;
-      if (address.address.indexOf('fe80::') === 0) continue;
+      if (address.address.indexOf('fe80::') === 0) continue; //Ignore link-local prefixes
+      if (address.address.indexOf('4006:') === 0) continue; //Ignore bogus prefixes created by iOS bug.
 
       var addr = new v6.Address(address.address + '/64');
       prefixes.push(addr.parsedAddress.slice(0, 4).join(':'));
