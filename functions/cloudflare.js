@@ -1,60 +1,66 @@
-var cloudflare = require('cloudflare');
+var Cloudflare = require('cloudflare');
 var Config = require('../models/config');
 var Device = require('../models/device');
 var async = require('async');
 
-function updateDevice (domain, client, records) {
-  return function (device, cb) {
-    async.detect(records, function (record, cb) {
-      cb(record.display_name === device.domain && record.type === 'AAAA');
-    },
-    function (record) {
-      var options = {
-        name: device.domain,
-        type: 'AAAA',
-        content: device.ip,
-        ttl: 1
-      };
-      var handleResult = function (err, result) {
-        if (err) return cb(err);
-        cb(null);
-      };
-      if (record) return client.editDomainRecord(domain.zone_name, record.rec_id, options, handleResult);
-      client.addDomainRecord(domain.zone_name, options, handleResult);
-    });
-  };
-}
-
-function handleDomain (client, cb) {
-  return function (domain) {
-    if (!domain) return cb('Domain not found');
-    client.listDomainRecords(domain.zone_name, function (err, records) {
-      if (err) return cb(err);
-      Device.find({}, function (err, devices) {
-        if (err) return cb(err);
-        async.each(devices, updateDevice(domain, client, records), function(err) {
-          cb(err);
-        });
-      })
-    });
-  };
-}
-
 function updateCloudflare (cb) {
   Config.findOne({}, function (err, config) {
     if (err) return cb(err);
-    if (!config) return cb('Not yet configured');
-    var client = cloudflare.createClient({
+    if (!config) return cb('Not yet configured!');
+    var client = new Cloudflare({
       email: config.cloudflare.user,
-      token: config.cloudflare.key
+      key: config.cloudflare.key
     });
-    client.listDomains(function (err, domains) {
-      if(err) return cb(err);
-      async.detect(domains, function(zone, cb) {
-        cb(zone.zone_name === config.domain);
+    client.browseZones().then(function(zones) {
+      async.detect(zones.result, function (zone, cb) {
+        cb(null, zone.name == config.domain);
       }, handleDomain(client, cb));
+    }).catch(function(error) {
+      cb(error);
     });
   });
+}
+
+function handleDomain(client, cb) {
+  return function (err, zone) {
+    if(err) return cb(err);
+    client.browseDNS(zone.id, null, {per_page: 100}).then(function(dnses) {
+      Device.find({}, function (err, devices) {
+        if (err) return cb(err);
+        async.each(devices, updateDevice(zone, client, dnses.result), function(err) {
+          cb(err);
+        });
+      });
+    }).catch(function(error) {
+      cb(error);
+    })
+  }
+}
+
+function updateDevice (zone, client, records) {
+  return function (device, cb) {
+    async.detect(records, function (record, cb) {
+      cb(null, record.name.split('.')[0] === device.domain && record.type === 'AAAA');
+    }, function (err, record) {
+      if (err) return cb(err);
+        var options = {
+          name: device.domain + '.' + zone.name,
+          type: 'AAAA',
+          content: device.ip,
+          ttl: 1,
+          zoneId: zone.id
+        };
+
+        if (record) options.id = record.id;
+
+        var nRecord = Cloudflare.DNSRecord.create(options);
+        if (record) {
+          client.editDNS(nRecord).then(function() {cb(null)}).catch(cb);
+        } else {
+          client.addDNS(nRecord).then(function() {cb(null)}).catch(cb);
+        }
+    })
+  }
 }
 
 exports.updateCloudflare = updateCloudflare;

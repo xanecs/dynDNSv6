@@ -1,5 +1,5 @@
 var os = require('os');
-var v6 = require('ip-address').v6;
+var v6 = require('ip-address').Address6;
 
 exports.prefix = function () {
   var nics = os.networkInterfaces();
@@ -13,7 +13,7 @@ exports.prefix = function () {
       if (address.address.indexOf('fe80::') === 0) continue; //Ignore link-local prefixes
       if (address.address.indexOf('4006:') === 0) continue; //Ignore bogus prefixes created by iOS bug.
 
-      var addr = new v6.Address(address.address + '/64');
+      var addr = new v6(address.address + '/64');
       prefixes.push(addr.parsedAddress.slice(0, 4).join(':'));
     }
   }
